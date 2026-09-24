@@ -30,6 +30,7 @@ const connectDB = async () => {
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
 
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running' });
