@@ -3,6 +3,7 @@ import { CartProvider } from './context/CartContext';
 import AuthPage from './pages/AuthPage';
 import ProductsPage from './pages/ProductsPage';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 
 function App() {
   return (
@@ -20,6 +21,9 @@ function App() {
 
           {/* Cart Route */}
           <Route path="/cart" element={<CartPage />} />
+
+          {/* Checkout Route */}
+          <Route path="/checkout" element={<CheckoutPage />} />
 
           {/* 404 - Not Found */}
           <Route path="*" element={<Navigate to="/auth" replace />} />
