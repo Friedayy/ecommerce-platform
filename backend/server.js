@@ -28,6 +28,8 @@ const connectDB = async () => {
 };
 
 // Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running' });
 });
