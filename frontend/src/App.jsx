@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navbar';
 import AuthPage from './pages/AuthPage';
 import ProductsPage from './pages/ProductsPage';
@@ -10,8 +11,9 @@ import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
-    <CartProvider>
-      <Router>
+    <ToastProvider>
+      <CartProvider>
+        <Router>
         <div className="min-h-screen bg-gray-50 flex flex-col">
           <Navbar />
           <main className="flex-1">
@@ -44,6 +46,7 @@ function App() {
         </div>
       </Router>
     </CartProvider>
+  </ToastProvider>
   );
 }
 

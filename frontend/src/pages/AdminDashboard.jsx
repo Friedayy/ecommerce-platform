@@ -25,9 +25,11 @@ import {
   Star
 } from 'lucide-react';
 import { getProductImage } from '../utils/productImages';
+import { useToast } from '../context/ToastContext';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'orders'
 
@@ -65,7 +67,11 @@ export default function AdminDashboard() {
       return;
     }
     if (currentUser.role !== 'admin') {
-      alert('Access denied. Admin privileges required.');
+      showToast({
+        type: 'error',
+        title: 'Access Denied',
+        message: 'Admin privileges required to access the admin dashboard.'
+      });
       navigate('/products');
       return;
     }
@@ -169,14 +175,30 @@ export default function AdminDashboard() {
 
       if (editingProduct) {
         await updateProduct(editingProduct._id, productData);
+        showToast({
+          type: 'success',
+          title: 'Product Updated',
+          message: `"${productData.name}" has been updated.`
+        });
       } else {
         await createProduct(productData);
+        showToast({
+          type: 'success',
+          title: 'Product Created',
+          message: `"${productData.name}" has been added.`
+        });
       }
 
       setShowProductModal(false);
       fetchProducts();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save product');
+      const errMsg = err.response?.data?.message || 'Failed to save product';
+      setError(errMsg);
+      showToast({
+        type: 'error',
+        title: 'Error Saving Product',
+        message: errMsg
+      });
     } finally {
       setSubmitting(false);
     }
@@ -190,9 +212,18 @@ export default function AdminDashboard() {
 
     try {
       await deleteProduct(productId);
+      showToast({
+        type: 'info',
+        title: 'Product Deleted',
+        message: `"${productName}" was removed.`
+      });
       fetchProducts();
     } catch (err) {
-      alert('Failed to delete product');
+      showToast({
+        type: 'error',
+        title: 'Delete Failed',
+        message: 'Failed to delete product.'
+      });
     }
   };
 
@@ -200,9 +231,18 @@ export default function AdminDashboard() {
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
       await updateOrderStatus(orderId, newStatus);
+      showToast({
+        type: 'success',
+        title: 'Order Status Updated',
+        message: `Order status set to ${newStatus}.`
+      });
       fetchOrders();
     } catch (err) {
-      alert('Failed to update order status');
+      showToast({
+        type: 'error',
+        title: 'Update Failed',
+        message: 'Failed to update order status.'
+      });
     }
   };
 
