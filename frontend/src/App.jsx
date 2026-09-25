@@ -8,6 +8,7 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
               <Route path="*" element={<Navigate to="/products" replace />} />
             </Routes>
           </main>
+          <Footer />
         </div>
       </Router>
     </CartProvider>

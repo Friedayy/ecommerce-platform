@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getProducts } from '../services/productService';
 import { CartContext } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
@@ -41,9 +41,19 @@ export default function ProductsPage() {
   const { addToCart } = useContext(CartContext);
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Categories available
   const categories = ['Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Other'];
+
+  // Sync category filter from URL query param (e.g. from Footer links)
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat !== null && cat !== category) {
+      setCategory(cat);
+      setPage(1);
+    }
+  }, [searchParams]);
 
   // Fetch products whenever filters change
   useEffect(() => {
