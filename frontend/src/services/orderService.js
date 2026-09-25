@@ -15,7 +15,7 @@ export const createOrder = async (orderData) => {
  * @returns {Promise} Array of user's orders
  */
 export const getMyOrders = async () => {
-  const response = await api.get('/orders/my-orders');
+  const response = await api.get('/orders/myorders');
   return response.data;
 };
 
@@ -45,6 +45,6 @@ export const getAllOrders = async () => {
  * @returns {Promise} Updated order
  */
 export const updateOrderStatus = async (orderId, orderStatus) => {
-  const response = await api.put(`/orders/${orderId}`, { orderStatus });
+  const response = await api.put(`/orders/${orderId}/status`, { orderStatus });
   return response.data;
 };

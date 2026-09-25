@@ -2,6 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const dns = require('dns');
+
+// Configure reliable DNS servers for MongoDB Atlas SRV resolution
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {
+  // Ignore if not supported in environment
+}
 
 // Load environment variables
 dotenv.config();
