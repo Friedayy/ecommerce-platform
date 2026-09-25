@@ -77,15 +77,13 @@ export default function ProfilePage() {
 
   // Handle logout
   const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      logout();
-      showToast({
-        type: 'info',
-        title: 'Logged Out',
-        message: 'You have been signed out successfully'
-      });
-      navigate('/products');
-    }
+    logout();
+    showToast({
+      type: 'info',
+      title: 'Signed Out',
+      message: 'You have been signed out successfully.'
+    });
+    navigate('/products');
   };
 
   // Helper for order status badge styling

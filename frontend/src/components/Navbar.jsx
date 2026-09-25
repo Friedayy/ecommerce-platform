@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useToast } from '../context/ToastContext';
 import { getStoredUser, logout } from '../services/authService';
 import {
   ShoppingCart,
@@ -16,6 +17,7 @@ import {
 
 export default function Navbar() {
   const { getTotalItems } = useContext(CartContext);
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const user = getStoredUser();
@@ -26,10 +28,13 @@ export default function Navbar() {
   }
 
   const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      logout();
-      navigate('/auth');
-    }
+    logout();
+    showToast({
+      type: 'info',
+      title: 'Signed Out',
+      message: 'You have been signed out successfully.'
+    });
+    navigate('/products');
   };
 
   const totalItems = getTotalItems();
