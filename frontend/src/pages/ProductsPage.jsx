@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getProducts } from '../services/productService';
 import { CartContext } from '../context/CartContext';
 import { Search, Filter, ShoppingCart, Star, Loader, AlertCircle } from 'lucide-react';
+import { getProductImage } from '../utils/productImages';
 
 export default function ProductsPage() {
   // State for products and filters
@@ -70,22 +71,6 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-900">🛍️ Products</h1>
-            <button
-              onClick={() => navigate('/cart')}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              Go to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Sidebar Filters */}
@@ -101,8 +86,8 @@ export default function ProductsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Search
                 </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <div className="relative flex items-center">
+                  <Search className="absolute left-3 h-4 w-4 text-gray-400 pointer-events-none" />
                   <input
                     type="text"
                     placeholder="Search products..."
@@ -199,8 +184,20 @@ export default function ProductsPage() {
                   {products.map(product => (
                     <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                       {/* Product Image */}
-                      <div className="bg-gray-200 h-48 flex items-center justify-center">
-                        <span className="text-4xl">📦</span>
+                      <div className="bg-gray-100 h-52 w-full overflow-hidden relative group">
+                        <img
+                          src={getProductImage(product)}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80';
+                          }}
+                        />
+                        <span className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs text-xs font-semibold px-2 py-1 rounded shadow-xs text-gray-700">
+                          {product.category}
+                        </span>
                       </div>
 
                       {/* Product Info */}

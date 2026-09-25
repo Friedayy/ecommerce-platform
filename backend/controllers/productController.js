@@ -85,7 +85,7 @@ exports.getProduct = async (req, res) => {
 // @access  Private/Admin
 exports.createProduct = async (req, res) => {
   try {
-    const { name, description, price, category, stock } = req.body;
+    const { name, description, price, category, stock, image } = req.body;
 
     // Validation
     if (!name || !description || !price || !category || stock === undefined) {
@@ -100,7 +100,8 @@ exports.createProduct = async (req, res) => {
       description,
       price,
       category,
-      stock
+      stock,
+      image: image || null
     });
 
     res.status(201).json({
@@ -120,7 +121,7 @@ exports.createProduct = async (req, res) => {
 // @access  Private/Admin
 exports.updateProduct = async (req, res) => {
   try {
-    const { name, description, price, category, stock } = req.body;
+    const { name, description, price, category, stock, image } = req.body;
 
     let product = await Product.findById(req.params.id);
 
@@ -137,6 +138,7 @@ exports.updateProduct = async (req, res) => {
     if (price !== undefined) product.price = price;
     if (category) product.category = category;
     if (stock !== undefined) product.stock = stock;
+    if (image !== undefined) product.image = image;
 
     product.updatedAt = Date.now();
     product = await product.save();
