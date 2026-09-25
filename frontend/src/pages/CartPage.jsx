@@ -1,14 +1,59 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 import { isAuthenticated } from '../services/authService';
-import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, ShoppingCart } from 'lucide-react';
+import {
+  Trash2,
+  Plus,
+  Minus,
+  ArrowLeft,
+  ShoppingBag,
+  ShoppingCart,
+  Tag,
+  Sparkles,
+  CheckCircle2
+} from 'lucide-react';
 import { getProductImage } from '../utils/productImages';
 
 export default function CartPage() {
-  // Get cart from context
-  const { cart, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useContext(CartContext);
+  // Get cart and coupon tools from context
+  const {
+    cart,
+    updateQuantity,
+    removeFromCart,
+    getTotalPrice,
+    clearCart,
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon,
+    getDiscountAmount,
+    getShippingCost,
+    getGrandTotal
+  } = useContext(CartContext);
+  const { showToast } = useToast();
   const navigate = useNavigate();
+
+  const [couponInput, setCouponInput] = useState('');
+
+  const handleApplyCoupon = (codeToApply = null) => {
+    const code = codeToApply || couponInput;
+    const result = applyCoupon(code);
+    if (result.success) {
+      showToast({
+        type: 'success',
+        title: 'Coupon Applied!',
+        message: result.message
+      });
+      setCouponInput('');
+    } else {
+      showToast({
+        type: 'error',
+        title: 'Coupon Error',
+        message: result.message
+      });
+    }
+  };
 
   const handleProceedToCheckout = () => {
     if (!isAuthenticated()) {
@@ -26,9 +71,11 @@ export default function CartPage() {
   // Calculate totals
   const totalItems = cart.length;
   const totalPrice = getTotalPrice();
-  const taxAmount = totalPrice * 0.18; // 18% tax
-  const shippingCost = totalPrice > 500 ? 0 : 50; // Free shipping above ₹500
-  const grandTotal = totalPrice + taxAmount + shippingCost;
+  const discountAmount = getDiscountAmount(totalPrice);
+  const taxableAmount = Math.max(0, totalPrice - discountAmount);
+  const taxAmount = taxableAmount * 0.18; // 18% tax
+  const shippingCost = getShippingCost(totalPrice);
+  const grandTotal = getGrandTotal();
 
   // Empty cart view
   if (cart.length === 0) {
@@ -163,17 +210,105 @@ export default function CartPage() {
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-5">
                 Order Summary
               </h2>
 
+              {/* Coupon Code Section */}
+              <div className="mb-6 pb-6 border-b border-gray-200">
+                {appliedCoupon ? (
+                  <div className="bg-emerald-50 border border-emerald-200/80 rounded-xl p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-emerald-900 tracking-wide">
+                          {appliedCoupon.code} APPLIED
+                        </p>
+                        <p className="text-[11px] text-emerald-700">
+                          {appliedCoupon.description}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        removeCoupon();
+                        showToast({
+                          type: 'info',
+                          title: 'Coupon Removed',
+                          message: 'Coupon code was removed from your cart.'
+                        });
+                      }}
+                      className="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-1 rounded transition"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-2">
+                      Have a coupon code?
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleApplyCoupon();
+                          }
+                        }}
+                        placeholder="e.g. WELCOME10"
+                        className="flex-1 text-xs px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 uppercase tracking-wider font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleApplyCoupon()}
+                        className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg transition"
+                      >
+                        Apply
+                      </button>
+                    </div>
+
+                    {/* Quick Suggestion Chips */}
+                    <div className="flex flex-wrap gap-1.5 mt-2.5">
+                      {['WELCOME10', 'SAVE20', 'FREESHIP', 'FLAT100'].map((code) => (
+                        <button
+                          key={code}
+                          type="button"
+                          onClick={() => handleApplyCoupon(code)}
+                          className="text-[10px] font-mono font-semibold px-2 py-0.5 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded text-gray-600 transition border border-gray-200"
+                        >
+                          +{code}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Summary Lines */}
-              <div className="space-y-4 mb-6 pb-6 border-b border-gray-200">
+              <div className="space-y-3.5 mb-6 pb-6 border-b border-gray-200 text-sm">
                 {/* Subtotal */}
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
                   <span>₹{totalPrice.toFixed(2)}</span>
                 </div>
+
+                {/* Discount */}
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-medium">
+                    <span className="flex items-center gap-1.5">
+                      <Tag className="h-3.5 w-3.5" />
+                      Discount ({appliedCoupon?.code})
+                    </span>
+                    <span>-₹{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
 
                 {/* Tax */}
                 <div className="flex justify-between text-gray-600">
@@ -186,8 +321,8 @@ export default function CartPage() {
                   <div>
                     <span>Shipping</span>
                     {shippingCost === 0 && (
-                      <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                        FREE
+                      <span className="ml-2 text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded">
+                        {appliedCoupon?.type === 'shipping' ? 'COUPON FREE' : 'FREE'}
                       </span>
                     )}
                   </div>
@@ -197,7 +332,14 @@ export default function CartPage() {
 
               {/* Grand Total */}
               <div className="flex justify-between items-center mb-6">
-                <span className="text-lg font-semibold text-gray-900">Total</span>
+                <div>
+                  <span className="text-base font-semibold text-gray-900 block">Total</span>
+                  {discountAmount > 0 && (
+                    <span className="text-xs text-emerald-600 font-medium">
+                      You saved ₹{discountAmount.toFixed(2)}!
+                    </span>
+                  )}
+                </div>
                 <span className="text-2xl font-bold text-blue-600">
                   ₹{grandTotal.toFixed(2)}
                 </span>

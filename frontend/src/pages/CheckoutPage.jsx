@@ -3,11 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { createOrder } from '../services/orderService';
 import { isAuthenticated } from '../services/authService';
-import { ArrowLeft, Loader, AlertCircle, CheckCircle, CreditCard, MapPin, LogIn } from 'lucide-react';
+import {
+  ArrowLeft,
+  Loader,
+  AlertCircle,
+  CheckCircle,
+  CreditCard,
+  MapPin,
+  LogIn,
+  Tag,
+  Sparkles
+} from 'lucide-react';
 
 export default function CheckoutPage() {
-  // Get cart from context
-  const { cart, getTotalPrice, clearCart } = useContext(CartContext);
+  // Get cart and coupon tools from context
+  const {
+    cart,
+    getTotalPrice,
+    clearCart,
+    appliedCoupon,
+    getDiscountAmount,
+    getShippingCost,
+    getGrandTotal
+  } = useContext(CartContext);
   const navigate = useNavigate();
 
   // Form state for shipping address
@@ -28,11 +46,13 @@ export default function CheckoutPage() {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderId, setOrderId] = useState('');
 
-  // Calculate totals (same as CartPage)
+  // Calculate totals including discounts
   const totalPrice = getTotalPrice();
-  const taxAmount = totalPrice * 0.18;
-  const shippingCost = totalPrice > 500 ? 0 : 50;
-  const grandTotal = totalPrice + taxAmount + shippingCost;
+  const discountAmount = getDiscountAmount(totalPrice);
+  const taxableAmount = Math.max(0, totalPrice - discountAmount);
+  const taxAmount = taxableAmount * 0.18;
+  const shippingCost = getShippingCost(totalPrice);
+  const grandTotal = getGrandTotal();
 
   // Check if user is authenticated before allowing checkout
   if (!isAuthenticated() && !orderSuccess) {
@@ -447,9 +467,24 @@ export default function CheckoutPage() {
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Order Summary
               </h2>
+
+              {/* Applied Coupon Banner */}
+              {appliedCoupon && (
+                <div className="mb-4 bg-emerald-50 border border-emerald-200/80 rounded-xl p-3 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-emerald-900 uppercase">
+                      {appliedCoupon.code} Applied
+                    </p>
+                    <p className="text-[11px] text-emerald-700 truncate">
+                      {appliedCoupon.description}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Items List */}
               <div className="mb-6 pb-6 border-b border-gray-200 max-h-48 overflow-y-auto">
@@ -469,21 +504,34 @@ export default function CheckoutPage() {
               </div>
 
               {/* Totals */}
-              <div className="space-y-3 mb-6">
+              <div className="space-y-3 mb-6 text-sm">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
                   <span>₹{totalPrice.toFixed(2)}</span>
                 </div>
+
+                {/* Discount Line */}
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-medium">
+                    <span className="flex items-center gap-1.5">
+                      <Tag className="h-3.5 w-3.5" />
+                      Discount ({appliedCoupon?.code})
+                    </span>
+                    <span>-₹{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-gray-600">
                   <span>Tax (18%)</span>
                   <span>₹{taxAmount.toFixed(2)}</span>
                 </div>
+
                 <div className="flex justify-between text-gray-600">
                   <div>
                     <span>Shipping</span>
                     {shippingCost === 0 && (
-                      <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                        FREE
+                      <span className="ml-2 text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded">
+                        {appliedCoupon?.type === 'shipping' ? 'COUPON FREE' : 'FREE'}
                       </span>
                     )}
                   </div>
@@ -494,7 +542,14 @@ export default function CheckoutPage() {
               {/* Grand Total */}
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-900">Total</span>
+                  <div>
+                    <span className="text-base font-semibold text-gray-900 block">Total</span>
+                    {discountAmount > 0 && (
+                      <span className="text-xs text-emerald-600 font-medium">
+                        Saved ₹{discountAmount.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
                   <span className="text-2xl font-bold text-blue-600">
                     ₹{grandTotal.toFixed(2)}
                   </span>
