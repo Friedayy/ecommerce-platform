@@ -11,7 +11,11 @@
   "keywords": [
     "ecommerce",
     "express",
-    "mongodb"
+    "mongodb",
+    "mongoose",
+    "nodejs",
+    "jwt-authentication",
+    "rest-api"
   ],
   "author": "Friedayy",
   "license": "ISC",

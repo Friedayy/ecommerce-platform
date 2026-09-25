@@ -1,8 +1,18 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "E-Commerce Platform Frontend with React 19 and Tailwind CSS",
   "type": "module",
+  "keywords": [
+    "react",
+    "react19",
+    "tailwindcss",
+    "vite",
+    "ecommerce",
+    "cart",
+    "jwt-auth"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",

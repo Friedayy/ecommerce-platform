@@ -1,24 +1,31 @@
 # 🛒 E-Commerce Platform
 
+[![React 19](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)](https://expressjs.com/)
+[![MongoDB Atlas](https://img.shields.io/badge/MongoDB_Atlas-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)](https://vitejs.dev/)
+[![JWT](https://img.shields.io/badge/JWT_Auth-black?style=for-the-badge&logo=JSON%20web%20tokens)](https://jwt.io/)
+
 A full-stack e-commerce application built with React, Node.js, and MongoDB. This project demonstrates modern web development practices including authentication, real-time cart management, product filtering, and an admin panel.
 
 ## ✨ Features
 
-- **User Authentication**: Secure signup/login with JWT tokens
+- **Direct Platform Access**: Guests can immediately browse the catalog and add products to cart
+- **User Authentication**: Secure JWT login with pre-configured demo credentials
 - **Product Catalog**: Browse products with search and filtering by category/price
 - **Shopping Cart**: Add/remove items, update quantities, persistent storage
 - **Checkout Process**: Complete order flow with order confirmation
 - **User Dashboard**: View order history and manage profile
-- **Admin Panel**: Manage products, view orders, and user management
-- **Product Reviews**: Rate and review products with star ratings
+- **Admin Panel**: Manage products (with custom image URLs), view orders, and update order status
 - **Responsive Design**: Mobile-first design that works on all devices
-- **Secure Payments**: Order management system ready for payment integration
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18** - UI framework
-- **Tailwind CSS** - Styling
+- **React 19** - UI framework
+- **Tailwind CSS v4** - Styling
 - **React Router** - Client-side routing
 - **Context API** - State management
 - **Axios** - HTTP client
