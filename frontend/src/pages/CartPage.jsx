@@ -1,12 +1,27 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
-import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { isAuthenticated } from '../services/authService';
+import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, ShoppingCart } from 'lucide-react';
+import { getProductImage } from '../utils/productImages';
 
 export default function CartPage() {
   // Get cart from context
   const { cart, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
+
+  const handleProceedToCheckout = () => {
+    if (!isAuthenticated()) {
+      navigate('/auth', {
+        state: {
+          message: 'Please login with the demo account to complete your order',
+          redirectTo: '/checkout'
+        }
+      });
+      return;
+    }
+    navigate('/checkout');
+  };
 
   // Calculate totals
   const totalItems = cart.length;
@@ -47,7 +62,10 @@ export default function CartPage() {
             <ArrowLeft className="h-5 w-5" />
             Back to Products
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">🛒 Shopping Cart</h1>
+          <div className="flex items-center gap-3">
+            <ShoppingCart className="h-8 w-8 text-gray-900" />
+            <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+          </div>
         </div>
       </div>
 
@@ -68,8 +86,17 @@ export default function CartPage() {
                 {cart.map(item => (
                   <div key={item._id} className="px-6 py-4 flex items-center gap-4">
                     {/* Product Image */}
-                    <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-2xl">📦</span>
+                    <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      <img
+                        src={getProductImage(item)}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80';
+                        }}
+                      />
                     </div>
 
                     {/* Product Details */}
@@ -178,7 +205,7 @@ export default function CartPage() {
 
               {/* Checkout Button */}
               <button
-                onClick={() => navigate('/checkout')}
+                onClick={handleProceedToCheckout}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
               >
                 Proceed to Checkout

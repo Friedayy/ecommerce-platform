@@ -2,7 +2,8 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { createOrder } from '../services/orderService';
-import { ArrowLeft, Loader, AlertCircle, CheckCircle } from 'lucide-react';
+import { isAuthenticated } from '../services/authService';
+import { ArrowLeft, Loader, AlertCircle, CheckCircle, CreditCard, MapPin, LogIn } from 'lucide-react';
 
 export default function CheckoutPage() {
   // Get cart from context
@@ -32,6 +33,40 @@ export default function CheckoutPage() {
   const taxAmount = totalPrice * 0.18;
   const shippingCost = totalPrice > 500 ? 0 : 50;
   const grandTotal = totalPrice + taxAmount + shippingCost;
+
+  // Check if user is authenticated before allowing checkout
+  if (!isAuthenticated() && !orderSuccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <LogIn className="h-8 w-8" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Please Login to Place Order</h1>
+          <p className="text-gray-600 mb-6">
+            You must be logged in to complete your purchase. Login using the provided demo account.
+          </p>
+          <button
+            onClick={() => navigate('/auth', {
+              state: {
+                message: 'Please login to complete your order',
+                redirectTo: '/checkout'
+              }
+            })}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition shadow-sm mb-3"
+          >
+            Login with Demo Account
+          </button>
+          <button
+            onClick={() => navigate('/cart')}
+            className="w-full border border-gray-300 hover:border-gray-400 text-gray-700 font-semibold py-3 px-4 rounded-lg transition"
+          >
+            Back to Cart
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Redirect if cart is empty
   if (cart.length === 0 && !orderSuccess) {
@@ -79,6 +114,16 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError('');
 
+    if (!isAuthenticated()) {
+      navigate('/auth', {
+        state: {
+          message: 'Please login to complete your order',
+          redirectTo: '/checkout'
+        }
+      });
+      return;
+    }
+
     if (!validateForm()) return;
 
     try {
@@ -100,7 +145,8 @@ export default function CheckoutPage() {
       const response = await createOrder(orderData);
 
       // Success - clear cart and show confirmation
-      setOrderId(response._id);
+      const placedOrderId = response.order?._id || response._id || 'CONFIRMED';
+      setOrderId(placedOrderId);
       setOrderSuccess(true);
       clearCart();
     } catch (err) {
@@ -117,7 +163,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
           <CheckCircle className="h-20 w-20 text-green-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed! ✅</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
           <p className="text-gray-600 mb-6">
             Thank you for your purchase. Your order has been successfully placed.
           </p>
@@ -193,7 +239,10 @@ export default function CheckoutPage() {
             <ArrowLeft className="h-5 w-5" />
             Back to Cart
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">💳 Checkout</h1>
+          <div className="flex items-center gap-3">
+            <CreditCard className="h-8 w-8 text-gray-900" />
+            <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
+          </div>
         </div>
       </div>
 
@@ -212,9 +261,12 @@ export default function CheckoutPage() {
 
               {/* Shipping Address Section */}
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-                  📍 Shipping Address
-                </h2>
+                <div className="flex items-center gap-2 mb-6">
+                  <MapPin className="h-6 w-6 text-blue-600" />
+                  <h2 className="text-2xl font-semibold text-gray-900">
+                    Shipping Address
+                  </h2>
+                </div>
 
                 {/* Street Address */}
                 <div className="mb-6">
@@ -299,9 +351,12 @@ export default function CheckoutPage() {
 
               {/* Payment Method Section */}
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-                  💰 Payment Method
-                </h2>
+                <div className="flex items-center gap-2 mb-6">
+                  <CreditCard className="h-6 w-6 text-blue-600" />
+                  <h2 className="text-2xl font-semibold text-gray-900">
+                    Payment Method
+                  </h2>
+                </div>
 
                 <div className="space-y-4">
                   {/* Credit Card */}
