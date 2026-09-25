@@ -1,9 +1,11 @@
 import { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { getStoredUser, logout } from '../services/authService';
 import {
   ShoppingCart,
+  Heart,
   User,
   LogOut,
   LogIn,
@@ -31,6 +33,7 @@ export default function Navbar() {
   };
 
   const totalItems = getTotalItems();
+  const { wishlistCount, openWishlist } = useWishlist();
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -60,6 +63,22 @@ export default function Navbar() {
             >
               <Package className="h-5 w-5" />
               <span className="hidden sm:inline">Products</span>
+            </button>
+
+            {/* Wishlist with Badge */}
+            <button
+              type="button"
+              onClick={openWishlist}
+              className="relative flex items-center gap-1 font-medium text-gray-600 hover:text-rose-600 transition"
+              title="Saved Items"
+            >
+              <Heart className={`h-5 w-5 ${wishlistCount > 0 ? 'text-rose-500 fill-rose-500' : ''}`} />
+              <span className="hidden sm:inline">Wishlist</span>
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-in zoom-in-75 duration-150">
+                  {wishlistCount > 99 ? '99+' : wishlistCount}
+                </span>
+              )}
             </button>
 
             {/* Cart with Badge */}

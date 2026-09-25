@@ -3,10 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getProducts } from '../services/productService';
 import { CartContext } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useWishlist } from '../context/WishlistContext';
 import {
   Search,
   Filter,
   ShoppingCart,
+  Heart,
   Star,
   Loader,
   AlertCircle,
@@ -40,6 +42,7 @@ export default function ProductsPage() {
   // Contexts
   const { addToCart } = useContext(CartContext);
   const { showToast } = useToast();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -261,9 +264,28 @@ export default function ProductsPage() {
                         />
 
                         {/* Category Badge */}
-                        <span className="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-xs text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-xs text-gray-700">
+                        <span className="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-xs text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-xs text-gray-700">
                           {product.category}
                         </span>
+
+                        {/* Wishlist Heart Toggle */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWishlist(product);
+                          }}
+                          className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs flex items-center justify-center shadow-xs text-gray-400 hover:text-rose-500 transition z-10"
+                          title={isInWishlist(product._id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                        >
+                          <Heart
+                            className={`h-4 w-4 transition-transform active:scale-125 ${
+                              isInWishlist(product._id)
+                                ? 'fill-rose-500 text-rose-500'
+                                : 'text-gray-400 hover:text-rose-500'
+                            }`}
+                          />
+                        </button>
 
                         {/* Quick View Hover Button */}
                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -533,6 +555,30 @@ export default function ProductsPage() {
                     Buy Now
                   </button>
                 </div>
+
+                {/* Wishlist Toggle in Modal */}
+                <button
+                  type="button"
+                  onClick={() => toggleWishlist(selectedProduct)}
+                  className={`w-full py-2.5 px-4 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition ${
+                    isInWishlist(selectedProduct._id)
+                      ? 'border-rose-200 bg-rose-50 text-rose-600'
+                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <Heart
+                    className={`h-4 w-4 transition-transform ${
+                      isInWishlist(selectedProduct._id)
+                        ? 'fill-rose-500 text-rose-500'
+                        : 'text-gray-400'
+                    }`}
+                  />
+                  <span>
+                    {isInWishlist(selectedProduct._id)
+                      ? 'Saved in Wishlist (Click to remove)'
+                      : 'Add to Wishlist'}
+                  </span>
+                </button>
               </div>
             </div>
           </div>
