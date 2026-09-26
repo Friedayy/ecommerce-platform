@@ -8,6 +8,7 @@ import {
   Mail,
   ArrowRight,
   ShoppingBag,
+  Store,
   CheckCircle2
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
@@ -103,7 +104,7 @@ export default function Footer() {
           <div className="lg:col-span-2 space-y-4">
             <Link to="/products" className="flex items-center gap-2.5 text-white font-bold text-xl">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-                <ShoppingBag className="h-5 w-5" />
+                <Store className="h-5 w-5" />
               </div>
               <span>ShopHub</span>
             </Link>
