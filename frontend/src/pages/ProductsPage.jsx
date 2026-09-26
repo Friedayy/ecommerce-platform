@@ -234,9 +234,20 @@ export default function ProductsPage() {
 
             {/* Error State */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                <p className="text-red-700 text-sm">{error}</p>
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-red-700 text-sm font-medium">{error}</p>
+                    <p className="text-red-500 text-xs mt-0.5">Free-tier backends (Render) can take up to 45 seconds to spin up from sleep mode.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={fetchProducts}
+                  className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition shrink-0"
+                >
+                  Retry Now
+                </button>
               </div>
             )}
 
